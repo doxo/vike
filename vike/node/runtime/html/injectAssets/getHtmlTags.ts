@@ -36,7 +36,6 @@ type InjectFilterEntry = {
    */
   isEntry: boolean
   inject: PreloadFilterInject
-  integrity?: string
 }
 
 type Position = 'HTML_BEGIN' | 'HTML_END' | 'HTML_STREAM'
