@@ -14,8 +14,8 @@ function inferPreloadTag(pageAsset: PageAsset): string {
   const rel = getRel(pageAsset)
   // `crossorigin` is needed for fonts, see https://developer.mozilla.org/en-US/docs/Web/HTML/Link_types/preload#cors-enabled_fetches
   let crossorigin = null
-  if (isCrossOrigin(pageAsset) && !integrity ) crossorigin = 'crossorigin'
-  if (integrity) crossorigin= 'crossorigin="anonymous"'
+  if (isCrossOrigin(pageAsset) && !integrity) crossorigin = 'crossorigin'
+  if (integrity) crossorigin = 'crossorigin="anonymous"'
   const attributes = [
     `rel="${rel}"`,
     `href="${src}"`,
