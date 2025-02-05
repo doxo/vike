@@ -24,6 +24,7 @@ type PageAsset = {
   assetType: null | NonNullable<MediaType>['assetType']
   mediaType: null | NonNullable<MediaType>['mediaType']
   isEntry: boolean
+  integrity?: string | null // the integrity attribute value, see https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity#using_subresource_integrity
 }
 type GetPageAssets = () => Promise<PageAsset[]>
 
@@ -74,11 +75,14 @@ async function getPageAssets(
       // Vite automatically injects CSS, not only in development, but also in production (albeit with a FOUC). Therefore, strictly speaking, CSS aren't entries. We still, however, set `isEntry: true` for CSS, in order to denote page assets that should absolutely be injected in the HTML, regardless of preload strategy (not injecting CSS leads to FOUC).
       assetType === 'style'
 
+    const integrity = null // temporary
+
     pageAssets.push({
       src,
       assetType,
       mediaType,
-      isEntry
+      isEntry,
+      integrity
     })
   })
 
