@@ -35,7 +35,7 @@ type InjectFilterEntry = {
    *  - All CSS files have `isEntry: true`
    */
   isEntry: boolean
-  inject: PreloadFilterInject,
+  inject: PreloadFilterInject
   integrity?: string
 }
 
