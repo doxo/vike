@@ -10,15 +10,19 @@ import type { PageAsset } from '../../renderPage/getPageAssets.js'
 const scriptAttrs = 'type="module" async'
 
 function inferPreloadTag(pageAsset: PageAsset): string {
-  const { src, assetType, mediaType } = pageAsset
+  const { src, assetType, mediaType, integrity } = pageAsset
   const rel = getRel(pageAsset)
+  // `crossorigin` is needed for fonts, see https://developer.mozilla.org/en-US/docs/Web/HTML/Link_types/preload#cors-enabled_fetches
+  let crossorigin = isCrossOrigin(pageAsset) ? 'crossorigin' : null
+  if (integrity && crossorigin) crossorigin+= '="anonymous"'
   const attributes = [
     `rel="${rel}"`,
     `href="${src}"`,
     !assetType ? null : `as="${assetType}"`,
     !mediaType ? null : `type="${mediaType}"`,
-    // `crossorigin` is needed for fonts, see https://developer.mozilla.org/en-US/docs/Web/HTML/Link_types/preload#cors-enabled_fetches
-    !isCrossOrigin(pageAsset) ? null : 'crossorigin'
+    !integrity ? null : `integrity="${integrity}"`,
+    crossorigin,
+
   ]
     .filter(Boolean)
     .join(' ')
@@ -26,19 +30,23 @@ function inferPreloadTag(pageAsset: PageAsset): string {
 }
 
 function inferAssetTag(pageAsset: PageAsset): string {
-  const { src, assetType, mediaType } = pageAsset
+  const { src, assetType, mediaType, integrity } = pageAsset
+
+  const integrityAttrs = !integrity ? null : `integrity="${integrity}" crossorigin="anonymous"`
+
   if (assetType === 'script') {
     assert(mediaType === 'text/javascript')
-    return `<script src="${src}" ${scriptAttrs}></script>`
+    return `<script src="${src}" ${scriptAttrs} ${integrityAttrs}></script>`
   }
   if (assetType === 'style') {
     // WARNING: if changing following line, then also update https://github.com/vikejs/vike/blob/fae90a15d88e5e87ca9fcbb54cf2dc8773d2f229/vike/client/shared/removeFoucBuster.ts#L29
-    return `<link rel="stylesheet" type="text/css" href="${src}">`
+    return `<link rel="stylesheet" type="text/css" href="${src}" ${integrityAttrs}>`
   }
   assert(false, { pageAsset })
 }
 
 // We ignore crossorigin, it seems like Early Hints doesn't have a "crossorigin" property: https://github.com/vikejs/vike/issues/618#issuecomment-1415752222
+// We ignore integrity, as Early Hints does not support integrity hashes.  The browser only checks integrity when it loads actual HTML.
 function inferEarlyHintLink(pageAsset: PageAsset): string {
   const { src, assetType } = pageAsset
   const rel = getRel(pageAsset)

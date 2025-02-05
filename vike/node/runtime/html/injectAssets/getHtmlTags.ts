@@ -35,7 +35,8 @@ type InjectFilterEntry = {
    *  - All CSS files have `isEntry: true`
    */
   isEntry: boolean
-  inject: PreloadFilterInject
+  inject: PreloadFilterInject,
+  integrity?: string
 }
 
 type Position = 'HTML_BEGIN' | 'HTML_END' | 'HTML_STREAM'
